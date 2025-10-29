@@ -62,12 +62,9 @@ def scrape_tool(url: str) -> str:
 
         return content if content != "" else "No content"
 
-
-
-
-url = (
-    "https://www.chosun.com/english/national-en/2025/10/28/ECPWADRPTBCOTKXLSIE3OCHWME/"
-)
-print(scrape_tool(url))
+# url = (
+#     "https://www.chosun.com/english/national-en/2025/10/28/ECPWADRPTBCOTKXLSIE3OCHWME/"
+# )
+# print(scrape_tool(url))
 
 
