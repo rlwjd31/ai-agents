@@ -3,6 +3,7 @@ from crewai import Crew, Agent, Task
 from crewai.project import CrewBase, crew, agent, task
 
 from models import ChosenJob, JobLIst, RankedJobList
+from tools import web_job_search_tool
 
 
 load_dotenv()
@@ -12,7 +13,9 @@ load_dotenv()
 class JobHunterCrew:
     @agent
     def job_search_agent(self) -> Agent:
-        return Agent(config=self.agents_config["job_search_agent"])
+        return Agent(
+            config=self.agents_config["job_search_agent"], tools=[web_job_search_tool]
+        )
 
     @agent
     def job_matching_agent(self) -> Agent:
