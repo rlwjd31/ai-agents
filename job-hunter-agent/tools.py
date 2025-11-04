@@ -12,37 +12,48 @@ FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_API_KEY")
 
 
 @tool
-def web_job_search_tool(query: str) -> str:
+def web_search_tool(query: str) -> str:
     """
-    웹에서 채용 공고를 검색하는 도구입니다.
-    Firecrawl API를 사용하여 인터넷에서 채용 공고를 검색하고,
-    관련 정보를 수집하여 반환합니다. 검색 결과는 제목, URL, markdown을 담은 dictionary를 요소로 하는 배열입니다.
-    
+    웹에서 정보를 검색하는 도구입니다.
+
+    Firecrawl API를 사용하여 인터넷에서 검색 쿼리에 관련된 정보를 검색하고,
+    관련 웹페이지의 내용을 수집하여 반환합니다. 검색 결과는 제목, URL, 마크다운 내용을 담은 dictionary를 요소로 하는 배열입니다.
+
     Args:
-        query (str): 검색할 채용 공고 키워드 또는 질문
-                      예: "프론트엔드 신입 개발자", "React 개발자 채용", "백엔드 개발자"
-    
+        query (str): 검색할 키워드 또는 질문
+        예: "프론트엔드 개발자 채용", "Python 최신 뉴스", "React 튜토리얼"
+
     Returns:
-        list: 채용 공고 정보 리스트. 각 항목은 다음을 포함:
-            - title (str): 채용 공고 제목
-            - url (str): 채용 공고 URL
-            - markdown (str): 채용 공고 내용 (마크다운 형식, 링크 및 불필요한 문자 제거됨)
-        
+        list: 웹 검색 결과 리스트. 각 항목은 다음을 포함:
+            - title (str): 웹페이지 제목
+            - url (str): 웹페이지 URL
+            - markdown (str): 웹페이지 내용 (마크다운 형식, 링크 및 불필요한 문자 제거됨)
+
         에러 발생 시:
             str: 에러 메시지
-    
+
     Examples:
-        >>> web_job_search_tool("프론트엔드 개발자")
+        >>> web_search_tool("Python 개발자 채용")
         [
             {
-                "title": "프론트엔드 개발자 채용",
+                "title": "Python 개발자 채용 공고",
                 "url": "https://example.com/job/123",
-                "markdown": "React, TypeScript 경험 필요..."
+                "markdown": "Django, Flask 경험 필요..."
+            },
+            ...
+        ]
+
+        >>> web_search_tool("최신 AI 기술 동향")
+        [
+            {
+                "title": "2024 AI 기술 트렌드",
+                "url": "https://example.com/ai-trends",
+                "markdown": "AI 기술의 최신 동향에 대해..."
             },
             ...
         ]
     """
-    
+
     headers = {
         "Authorization": f"Bearer {FIRECRAWL_API_KEY}",
         "Content-Type": "application/json",
@@ -57,37 +68,37 @@ def web_job_search_tool(query: str) -> str:
     }
 
     try:
-      response = requests.post(FIRECRAWL_ENDPOINT, json=payload, headers=headers)
-      response.raise_for_status()
-      response_data = response.json()
+        response = requests.post(FIRECRAWL_ENDPOINT, json=payload, headers=headers)
+        response.raise_for_status()
+        response_data = response.json()
 
-      if not response_data.get("success"):
-        return "Error: Failed to search the web with search tool"
+        if not response_data.get("success"):
+            return "Error: Failed to search the web with search tool"
 
-      results = []
-      # 불필요한 문자열 parsing -> 토큰 줄이기
-      for data in response_data.get("data").get("web"):
-        # \\+ 👉🏻 \가 1번 이상되는 것
-        # | 👉🏻 or
-        # \n 👉🏻 개행
-        # 즉, \가 1번 이상이거나 \n이면 제거.
-        cleaned_markdown = re.sub(r"\\+|\n", "", data.get("markdown") or "").strip()
-        # markdown link 제거 정규식
-        cleaned_markdown = re.sub(r"\[[^\]]+\]\([^\)]+\)|https?://[^\s]+", "", cleaned_markdown)
-        result = { 
-            "title": data.get("title") or "",
-            "url": data.get("url") or "",
-            
-            "markdown": cleaned_markdown
-        }
+        results = []
+        # 불필요한 문자열 parsing -> 토큰 줄이기
+        for data in response_data.get("data").get("web"):
+            # \\+ 👉🏻 \가 1번 이상되는 것
+            # | 👉🏻 or
+            # \n 👉🏻 개행
+            # 즉, \가 1번 이상이거나 \n이면 제거.
+            cleaned_markdown = re.sub(r"\\+|\n", "", data.get("markdown") or "").strip()
+            # markdown link 제거 정규식
+            cleaned_markdown = re.sub(
+                r"\[[^\]]+\]\([^\)]+\)|https?://[^\s]+", "", cleaned_markdown
+            )
+            result = {
+                "title": data.get("title") or "",
+                "url": data.get("url") or "",
+                "markdown": cleaned_markdown,
+            }
 
-        results.append(result)
+            results.append(result)
 
-      return results
+        return results
 
     except Exception as e:
-      return f"Error:> {e}"
-
+        return f"Error:> {e}"
 
 
 # print(web_search_tool("프론트엔드 신입 공고"))

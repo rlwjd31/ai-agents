@@ -4,7 +4,7 @@ from crewai.project import CrewBase, crew, agent, task
 from crewai.knowledge.source.text_file_knowledge_source import TextFileKnowledgeSource
 
 from models import ChosenJob, JobLIst, RankedJobList
-from tools import web_job_search_tool
+from tools import web_search_tool
 
 
 load_dotenv()
@@ -18,7 +18,7 @@ class JobHunterCrew:
     @agent
     def job_search_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config["job_search_agent"], tools=[web_job_search_tool]
+            config=self.agents_config["job_search_agent"], tools=[web_search_tool]
         )
 
     @agent
