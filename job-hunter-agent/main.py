@@ -10,8 +10,25 @@ from tools import web_search_tool
 load_dotenv()
 
 # knowledge directory를 설정해주어야 알아서 읽어들임
-resume_knowledge = TextFileKnowledgeSource(file_path=["resume.txt"])
+resume_knowledge_for_match = TextFileKnowledgeSource(
+    file_paths=["resume.txt"],
+    collection_name="resume_for_match",
+)
 
+resume_knowledge_for_optimization = TextFileKnowledgeSource(
+    file_paths=["resume.txt"],
+    collection_name="resume_for_optimization",
+)
+
+resume_knowledge_for_research = TextFileKnowledgeSource(
+    file_paths=["resume.txt"],
+    collection_name="resume_for_research",
+)
+
+resume_knowledge_for_interview = TextFileKnowledgeSource(
+    file_paths=["resume.txt"],
+    collection_name="resume_for_interview",
+)
 
 @CrewBase
 class JobHunterCrew:
@@ -25,28 +42,29 @@ class JobHunterCrew:
     def job_matching_agent(self) -> Agent:
         return Agent(
             config=self.agents_config["job_matching_agent"],
-            knowledge_sources=[resume_knowledge],
+            knowledge_sources=[resume_knowledge_for_match],
         )
 
     @agent
     def resume_optimization_agent(self) -> Agent:
         return Agent(
             config=self.agents_config["resume_optimization_agent"],
-            knowledge_sources=[resume_knowledge],
+            knowledge_sources=[resume_knowledge_for_optimization],
         )
 
     @agent
     def company_research_agent(self) -> Agent:
         return Agent(
             config=self.agents_config["company_research_agent"],
-            knowledge_sources=[resume_knowledge],
+            knowledge_sources=[resume_knowledge_for_research],
+            tools=[web_search_tool],
         )
 
     @agent
     def interview_prep_agent(self) -> Agent:
         return Agent(
             config=self.agents_config["interview_prep_agent"],
-            knowledge_sources=[resume_knowledge],
+            knowledge_sources=[resume_knowledge_for_interview],
         )
 
     @task
@@ -99,4 +117,9 @@ class JobHunterCrew:
         return Crew(agents=self.agents, tasks=self.tasks, verbose=True)
 
 
-JobHunterCrew().crew().kickoff()
+input_variables = {
+    "level": "신입",
+    "position": "프론트엔드 개발자",
+    "location": "대한민국",
+}
+JobHunterCrew().crew().kickoff(inputs=input_variables)
