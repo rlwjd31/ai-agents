@@ -13,6 +13,36 @@ FIRECRAWL_API_KEY = os.getenv("FIRECRAWL_API_KEY")
 
 @tool
 def web_job_search_tool(query: str) -> str:
+    """
+    웹에서 채용 공고를 검색하는 도구입니다.
+    Firecrawl API를 사용하여 인터넷에서 채용 공고를 검색하고,
+    관련 정보를 수집하여 반환합니다. 검색 결과는 제목, URL, markdown을 담은 dictionary를 요소로 하는 배열입니다.
+    
+    Args:
+        query (str): 검색할 채용 공고 키워드 또는 질문
+                      예: "프론트엔드 신입 개발자", "React 개발자 채용", "백엔드 개발자"
+    
+    Returns:
+        list: 채용 공고 정보 리스트. 각 항목은 다음을 포함:
+            - title (str): 채용 공고 제목
+            - url (str): 채용 공고 URL
+            - markdown (str): 채용 공고 내용 (마크다운 형식, 링크 및 불필요한 문자 제거됨)
+        
+        에러 발생 시:
+            str: 에러 메시지
+    
+    Examples:
+        >>> web_job_search_tool("프론트엔드 개발자")
+        [
+            {
+                "title": "프론트엔드 개발자 채용",
+                "url": "https://example.com/job/123",
+                "markdown": "React, TypeScript 경험 필요..."
+            },
+            ...
+        ]
+    """
+    
     headers = {
         "Authorization": f"Bearer {FIRECRAWL_API_KEY}",
         "Content-Type": "application/json",
