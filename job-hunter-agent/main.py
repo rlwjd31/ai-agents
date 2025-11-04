@@ -1,12 +1,16 @@
 from dotenv import load_dotenv
 from crewai import Crew, Agent, Task
 from crewai.project import CrewBase, crew, agent, task
+from crewai.knowledge.source.text_file_knowledge_source import TextFileKnowledgeSource
 
 from models import ChosenJob, JobLIst, RankedJobList
 from tools import web_job_search_tool
 
 
 load_dotenv()
+
+# knowledge directory를 설정해주어야 알아서 읽어들임
+resume_knowledge = TextFileKnowledgeSource(file_path=["resume.txt"])
 
 
 @CrewBase
@@ -19,19 +23,31 @@ class JobHunterCrew:
 
     @agent
     def job_matching_agent(self) -> Agent:
-        return Agent(config=self.agents_config["job_matching_agent"])
+        return Agent(
+            config=self.agents_config["job_matching_agent"],
+            knowledge_sources=[resume_knowledge],
+        )
 
     @agent
     def resume_optimization_agent(self) -> Agent:
-        return Agent(config=self.agents_config["resume_optimization_agent"])
+        return Agent(
+            config=self.agents_config["resume_optimization_agent"],
+            knowledge_sources=[resume_knowledge],
+        )
 
     @agent
     def company_research_agent(self) -> Agent:
-        return Agent(config=self.agents_config["company_research_agent"])
+        return Agent(
+            config=self.agents_config["company_research_agent"],
+            knowledge_sources=[resume_knowledge],
+        )
 
     @agent
     def interview_prep_agent(self) -> Agent:
-        return Agent(config=self.agents_config["interview_prep_agent"])
+        return Agent(
+            config=self.agents_config["interview_prep_agent"],
+            knowledge_sources=[resume_knowledge],
+        )
 
     @task
     def job_extraction_task(self) -> Task:
