@@ -30,6 +30,7 @@ resume_knowledge_for_interview = TextFileKnowledgeSource(
     collection_name="resume_for_interview",
 )
 
+
 @CrewBase
 class JobHunterCrew:
     @agent
@@ -122,4 +123,8 @@ input_variables = {
     "position": "프론트엔드 개발자",
     "location": "대한민국",
 }
-JobHunterCrew().crew().kickoff(inputs=input_variables)
+
+results = JobHunterCrew().crew().kickoff(inputs=input_variables)
+
+for task_output in results.tasks_output:
+    print(task_output.pydantic)
